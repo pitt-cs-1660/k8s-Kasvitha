@@ -81,6 +81,58 @@ spec:
         - name: mysql-data
           persistentVolumeClaim:
             claimName: mysql-pv-claim
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wordpress-mysql
+  labels:
+    app: wordpress
+    tier: mysql
+spec:
+  selector:
+    matchLabels:
+      app: wordpress
+      tier: mysql
+  template:
+    metadata:
+      labels:
+        app: wordpress
+        tier: mysql
+    spec:
+      containers:
+        - name: mysql
+          image: mysql:5.7
+          env:
+            - name: MYSQL_DATABASE
+              valueFrom:
+                configMapKeyRef:
+                  name: wordpress-mysql
+                  key: database
+            - name: MYSQL_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: wordpress-mysql
+                  key: user
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: database
+                  key: root-password
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: database
+                  key: user-password
+          ports:
+            - containerPort: 3306
+          volumeMounts:
+            - name: mysql-data
+              mountPath: /var/lib/mysql
+      volumes:
+        - name: mysql-data
+          persistentVolumeClaim:
+            claimName: mysql-pv-claim
+
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
