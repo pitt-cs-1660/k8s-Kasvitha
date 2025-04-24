@@ -72,6 +72,11 @@ spec:
           volumeMounts:
             - name: mysql-data
               mountPath: /var/lib/mysql
+          lifecycle:
+            postStart:
+              exec:
+                command: ["/bin/sh", "-c", "sleep 15"]
+
           resources:
             requests:
               cpu: "100m"
