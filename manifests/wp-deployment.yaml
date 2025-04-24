@@ -7,12 +7,12 @@ metadata:
     app: wordpress
     tier: frontend
 spec:
+  ports:
+    - port: 80
+      targetPort: 80  # Added for clarity
   selector:
     app: wordpress
     tier: frontend
-  ports:
-    - port: 80
-      targetPort: 80
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -30,7 +30,7 @@ metadata:
     app: wordpress
     tier: frontend
 spec:
-  replicas: 2  # Optional: reduce to 2 for resource-constrained clusters
+  replicas: 3
   selector:
     matchLabels:
       app: wordpress

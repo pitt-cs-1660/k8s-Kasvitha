@@ -7,11 +7,12 @@ metadata:
     app: wordpress
     tier: mysql
 spec:
-  ports:
-    - port: 3306
   selector:
     app: wordpress
     tier: mysql
+  ports:
+    - port: 3306
+      targetPort: 3306  # Optional but clear
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -41,8 +42,9 @@ spec:
     spec:
       containers:
         - name: mysql
-          image: mysql:5.7  # ✅ more stable with WordPress
+          image: mysql:5.7  
           env:
+            # Non-sensitive values from ConfigMap
             - name: MYSQL_DATABASE
               valueFrom:
                 configMapKeyRef:
@@ -53,6 +55,8 @@ spec:
                 configMapKeyRef:
                   name: wordpress-mysql
                   key: user
+
+            # Sensitive values from Secret
             - name: MYSQL_ROOT_PASSWORD
               valueFrom:
                 secretKeyRef:
@@ -63,12 +67,23 @@ spec:
                 secretKeyRef:
                   name: database
                   key: user-password
+
           ports:
             - containerPort: 3306
               name: mysql
+
           volumeMounts:
             - name: mysql-data
               mountPath: /var/lib/mysql
+
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "250m"
+              memory: "256Mi"
+
       volumes:
         - name: mysql-data
           persistentVolumeClaim:
