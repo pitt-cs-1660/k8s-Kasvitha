@@ -42,8 +42,9 @@ spec:
     spec:
       containers:
         - name: mysql
-          image: mysql:5.7
+          image: mysql:5.7  
           env:
+            # Non-sensitive from ConfigMap
             - name: MYSQL_DATABASE
               valueFrom:
                 configMapKeyRef:
@@ -54,6 +55,7 @@ spec:
                 configMapKeyRef:
                   name: wordpress-mysql
                   key: user
+            # Sensitive from Secret
             - name: MYSQL_ROOT_PASSWORD
               valueFrom:
                 secretKeyRef:
